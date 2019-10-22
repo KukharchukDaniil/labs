@@ -1,0 +1,103 @@
+#include <iostream>
+#include <cmath>
+#include <ctime>
+using namespace std;
+
+double fxi1(double x) //fxi  - подынтегральное выражение
+{
+	return sqrt(pow(2, x) - 1);
+}
+double fxi2(double x)
+{
+	return (x*x-1)*pow(10, -2*x);
+}
+double fxi3(double x)
+{
+	return pow(tan((x / 2.0) + (3.141592 / 4.0)), 3);
+}
+double fpribl_left(double n, double A, double B, double(*z)(double))
+{
+	double sum = 0;
+	for (int i = 0; i < n; i++)
+		sum += z(A+i*(B - A) / n);
+	return sum * (B - A) / n;
+}
+
+double fpribl_simps(double n, double A, double B, double(*z)(double))
+{
+	
+double sum = 0;
+	double b2 = 0;
+	double b1 = 0;
+	for (int i = 1; i <= n; i += 2)
+	{
+		b1 += z(A + i * (B - A) / n);
+		
+		b2 += z(A + (i + 1) * (B - A) / n);
+	}
+		sum = z(A) + 4 * b1 + 2 * b2;;
+	return sum * (B - A) / n / 3;
+}
+void FuncOut1(double A, double B, double E, double(*z)(double))
+{
+	double n = 1;
+	while (fabs((fpribl_left(n, A, B, z) - fpribl_left(n * 2, A, B, z))) >= E)
+		n *= 2;
+	cout << "Integral  (Left rectangle method) = " << fpribl_left(n * 2, A, B, z) << " | n = " << n * 2 << endl;
+	n = 1;
+	while (fabs((fpribl_simps(n, A, B, z) - fpribl_simps(n * 2, A, B, z))) >= E)
+		n *= 2;
+	cout << "Integral  (Simpson method) = " << fpribl_simps(n * 2, A, B, z) << " | n = " << n * 2 << endl;
+}
+void FuncOut2(double A, double B, double E, double(*z)(double))
+{
+	double n = 1;
+	while (fabs((fpribl_left(n, A, B, z) - fpribl_left(n * 2, A, B, z))) >= E)
+		n *= 2;
+	cout << "Integral  (Left rectangle method) = " << -fpribl_left(n * 2, A, B, z) << " | n = " << n * 2 << endl;
+	n = 1;
+	while (fabs((fpribl_simps(n, A, B, z) - fpribl_simps(n * 2, A, B, z))) >= E)
+		n *= 2;
+	cout << "Integral  (Simpson method) = " << -fpribl_simps(n * 2, A, B, z) << " | n = " << n * 2 << endl;
+}
+
+int main()
+{
+rep:
+	double A, B, E, t;
+	cout << "Choose the integral number(1,2 or 3)" << endl;
+err:
+	cin >> t;
+	cout << "Enter the integral borders[A,B]" << endl;
+	cin >> A >> B;
+	cout << "Enter eps" << endl;
+	cin >> E;
+	if (A > B)
+	{
+		swap(A, B);
+		if (t == 1)
+			FuncOut2(A, B, E, fxi1);
+		if (t == 2)
+			FuncOut2(A, B, E, fxi2);
+		if (t == 3)
+			FuncOut2(A, B, E, fxi3);
+	}
+	else if (A == B)
+		cout << "Integral = 0\n";
+	else if (A < B)
+	{
+		
+		if (t == 1)
+			FuncOut1(A, B, E, fxi1);
+		else if (t == 2)
+			FuncOut1(A, B, E, fxi2);
+		else if (t == 3)
+			FuncOut1(A, B, E, fxi3);
+	}
+	cout << "Continue the program?(1 - Yes,   Any char - No):" << endl;
+	int ch;
+	cin >> ch;
+	if (ch == 1)
+		goto rep;
+	return 0;
+}
